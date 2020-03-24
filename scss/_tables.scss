@@ -1,31 +1,42 @@
+// stylelint-disable selector-max-universal
 //
 // Basic Bootstrap table
 //
 
 .table {
+  --table-cell-padding: #{$table-cell-padding};
+  --table-border-width: 0;
+  --table-border-bottom-width: #{$table-border-width};
+  --table-bg: #{$table-bg};
+  --table-accent-bg: #{$table-accent-bg};
+  --table-hover-bg: #{$table-hover-bg};
+  --table-hover-color: #{$table-hover-color};
+  --table-active-bg: #{$table-active-bg};
+
   width: 100%;
   margin-bottom: $spacer;
   color: $table-color;
   vertical-align: $table-cell-vertical-align;
-  background-color: $table-bg; // Reset for nesting within parents with `background-color`.
+  border-color: $table-border-color;
 
-  th,
-  td {
-    padding: $table-cell-padding;
-    border-bottom: $table-border-width solid $table-border-color;
+  // th & td
+  > * > * > * {
+    padding: var(--table-cell-padding);
+    background-color: var(--table-bg);
+    border-width: var(--table-border-width) var(--table-border-width) var(--table-border-bottom-width);
   }
 
-  tbody {
+  > tbody {
     vertical-align: inherit;
   }
 
-  thead th {
+  > thead {
     vertical-align: bottom;
-    border-bottom-color: $table-head-border-color;
   }
 
-  tbody + tbody {
-    border-top: (2 * $table-border-width) solid $table-border-color;
+  > :not(caption) + * {
+    // stylelint-disable-next-line function-blacklist
+    border-top: calc(2 * var(--table-border-bottom-width)) solid var(--table-border-color);
   }
 }
 
@@ -42,10 +53,7 @@
 //
 
 .table-sm {
-  th,
-  td {
-    padding: $table-cell-padding-sm;
-  }
+  --table-cell-padding: #{$table-cell-padding-sm};
 }
 
 
@@ -54,28 +62,11 @@
 // Add or remove borders all around the table and between all the columns.
 
 .table-bordered {
-  border: $table-border-width solid $table-border-color;
-
-  th,
-  td {
-    border: $table-border-width solid $table-border-color;
-  }
-
-  thead {
-    th,
-    td {
-      border-bottom-width: 2 * $table-border-width;
-    }
-  }
+  --table-border-width: #{$table-border-width};
 }
 
 .table-borderless {
-  th,
-  td,
-  thead th,
-  tbody + tbody {
-    border: 0;
-  }
+  --table-border-bottom-width: 0;
 }
 
 // Zebra-striping
@@ -83,8 +74,8 @@
 // Default zebra-stripe styles (alternating gray and transparent backgrounds)
 
 .table-striped {
-  tbody tr:nth-of-type(#{$table-striped-order}) {
-    background-color: $table-accent-bg;
+  > tbody > tr:nth-of-type(#{$table-striped-order}) > * {
+    background-image: linear-gradient(var(--table-accent-bg), var(--table-accent-bg));
   }
 }
 
@@ -94,11 +85,9 @@
 // Placed here since it has to come after the potential zebra striping
 
 .table-hover {
-  tbody tr {
-    &:hover {
-      color: $table-hover-color;
-      background-color: $table-hover-bg;
-    }
+  > tbody > tr:hover > * {
+    color: var(--table-hover-color);
+    background-image: linear-gradient(var(--table-hover-bg), var(--table-hover-bg));
   }
 }
 
@@ -108,66 +97,9 @@
 // Exact selectors below required to override `.table-striped` and prevent
 // inheritance to nested tables.
 
-@each $color, $value in $theme-colors {
-  @include table-row-variant($color, color-level($value, $table-bg-level), color-level($value, $table-border-level));
+@each $color, $value in $table-variants {
+  @include table-row-variant($color, $value);
 }
-
-@include table-row-variant(active, $table-active-bg);
-
-
-// Dark styles
-//
-// Same table markup, but inverted color scheme: dark background and light text.
-
-// stylelint-disable-next-line no-duplicate-selectors
-.table {
-  .thead-dark {
-    th {
-      color: $table-dark-color;
-      background-color: $table-dark-bg;
-      border-color: $table-dark-border-color;
-    }
-  }
-
-  .thead-light {
-    th {
-      color: $table-head-color;
-      background-color: $table-head-bg;
-      border-color: $table-border-color;
-    }
-  }
-}
-
-.table-dark {
-  color: $table-dark-color;
-  background-color: $table-dark-bg;
-
-  th,
-  td,
-  thead th {
-    border-color: $table-dark-border-color;
-  }
-
-  &.table-bordered {
-    border: 0;
-  }
-
-  &.table-striped {
-    tbody tr:nth-of-type(#{$table-striped-order}) {
-      background-color: $table-dark-accent-bg;
-    }
-  }
-
-  &.table-hover {
-    tbody tr {
-      &:hover {
-        color: $table-dark-hover-color;
-        background-color: $table-dark-hover-bg;
-      }
-    }
-  }
-}
-
 
 // Responsive tables
 //
